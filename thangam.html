@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thangam — your shy backup singer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,650;1,9..144,500&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+:root{
+  --stage-deep:#0B0E1A;
+  --stage-panel:#12162B;
+  --curtain:#1C2140;
+  --gold:#F2C14E;
+  --gold-dim:#8A6A2A;
+  --violet:#B98CFF;
+  --violet-dim:#4A3B7A;
+  --ink:#ECE7DC;
+  --ink-dim:#8A8CA3;
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(242,193,78,0.06), transparent 60%),
+    var(--stage-deep);
+  color:var(--ink);
+  font-family:'Space Grotesk', sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px 16px;
+  overflow-x:hidden;
+}
+
+.frame{
+  width:100%;
+  max-width:560px;
+}
+
+.eyebrow{
+  font-size:12px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  text-align:center;
+  margin-bottom:6px;
+  font-weight:500;
+}
+
+h1{
+  font-family:'Fraunces', serif;
+  font-weight:650;
+  font-style:italic;
+  font-size:clamp(38px,9vw,56px);
+  text-align:center;
+  margin:0 0 6px;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+}
+
+.sub{
+  text-align:center;
+  color:var(--ink-dim);
+  font-size:14.5px;
+  max-width:380px;
+  margin:0 auto 28px;
+  line-height:1.5;
+}
+
+.stage{
+  position:relative;
+  height:280px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, var(--stage-panel) 0%, #0D1024 100%);
+  border:1px solid rgba(255,255,255,0.06);
+  overflow:hidden;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* curtains */
+.curtain{
+  position:absolute;
+  top:0; bottom:0;
+  width:15%;
+  background:
+    repeating-linear-gradient(90deg, var(--curtain) 0px, #171B37 8px, var(--curtain) 16px);
+  z-index:3;
+  transition:transform 900ms cubic-bezier(.16,1,.3,1);
+}
+.curtain.left{left:0; transform-origin:left; border-right:1px solid rgba(0,0,0,0.4);}
+.curtain.right{right:0; transform-origin:right; border-left:1px solid rgba(0,0,0,0.4);}
+.stage.open .curtain.left{transform:translateX(-100%);}
+.stage.open .curtain.right{transform:translateX(100%);}
+
+/* spotlight */
+.spotlight{
+  position:absolute;
+  left:50%; top:-40%;
+  width:340px; height:340px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(242,193,78,0.0) 0%, rgba(242,193,78,0.0) 40%, transparent 70%);
+  transition:background 200ms linear;
+  pointer-events:none;
+  z-index:2;
+}
+
+.floor-glow{
+  position:absolute;
+  left:50%; bottom:0;
+  width:220px; height:60px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse, rgba(242,193,78,0.0) 0%, transparent 75%);
+  transition:background 200ms linear;
+  z-index:1;
+}
+
+/* character */
+.character{
+  position:absolute;
+  left:50%;
+  bottom:24px;
+  transform:translate(-50%, 0) scale(0.94);
+  width:64px;
+  height:110px;
+  z-index:4;
+  transition:transform 500ms cubic-bezier(.16,1,.3,1);
+}
+.character svg{width:100%; height:100%; display:block;}
+.character .body{ fill:#20243F; transition:fill 200ms linear; }
+.character .glow-outline{ stroke:var(--gold); stroke-opacity:0; transition:stroke-opacity 200ms linear; }
+
+.mic-stand{
+  position:absolute;
+  left:50%; bottom:24px;
+  transform:translate(6px,0);
+  width:3px; height:70px;
+  background:linear-gradient(180deg, #3A3E5C, #23263F);
+  z-index:3;
+}
+
+.label-row{
+  position:absolute;
+  bottom:12px; left:0; right:0;
+  text-align:center;
+  z-index:5;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-dim);
+  transition:color 300ms linear, opacity 300ms linear;
+  opacity:0;
+  pointer-events:none;
+}
+.label-row.show{opacity:1;}
+
+.controls{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  margin-top:28px;
+}
+
+.mic-btn{
+  width:78px; height:78px;
+  border-radius:50%;
+  border:1px solid rgba(242,193,78,0.35);
+  background:radial-gradient(circle at 35% 30%, #1C2140, #12162B);
+  color:var(--gold);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:box-shadow 200ms ease, transform 120ms ease, border-color 200ms ease;
+  box-shadow:0 0 0 0 rgba(242,193,78,0);
+}
+.mic-btn:hover{transform:translateY(-1px);}
+.mic-btn:active{transform:translateY(0);}
+.mic-btn.live{
+  border-color:var(--gold);
+  box-shadow:0 0 0 8px rgba(242,193,78,0.06), 0 0 24px rgba(242,193,78,0.25);
+}
+.mic-btn svg{width:26px;height:26px;}
+
+.status{
+  font-size:13px;
+  color:var(--ink-dim);
+  min-height:18px;
+  text-align:center;
+}
+.status b{color:var(--gold); font-weight:500;}
+
+.meter-wrap{
+  width:100%;
+  max-width:340px;
+  margin-top:6px;
+}
+.meter-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:10.5px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-dim);
+  margin-bottom:6px;
+}
+.meter-track{
+  height:6px;
+  border-radius:3px;
+  background:rgba(255,255,255,0.06);
+  overflow:hidden;
+}
+.meter-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, var(--violet-dim), var(--violet), var(--gold));
+  transition:width 180ms linear;
+}
+
+.note{
+  margin-top:22px;
+  font-size:12px;
+  color:var(--ink-dim);
+  text-align:center;
+  line-height:1.6;
+  opacity:0.75;
+}
+.note a{color:inherit;}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:1ms !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="eyebrow">Useless Projects™ · Solo Act</div>
+  <h1>Thangam</h1>
+  <p class="sub">Your shy backup singer. Hum or sing into the mic — Thangam echoes back a harmony a beat late, and gets bolder the longer you keep going.</p>
+
+  <div class="stage" id="stage">
+    <div class="curtain left"></div>
+    <div class="curtain right"></div>
+    <div class="spotlight" id="spotlight"></div>
+    <div class="floor-glow" id="floorGlow"></div>
+    <div class="mic-stand"></div>
+    <div class="character" id="character">
+      <svg viewBox="0 0 64 110">
+        <ellipse class="body" cx="32" cy="30" rx="16" ry="18"/>
+        <path class="body" d="M14 50 Q32 40 50 50 L54 108 L10 108 Z"/>
+        <circle class="glow-outline" cx="32" cy="30" r="19" fill="none" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="label-row" id="labelRow">still finding the courage</div>
+  </div>
+
+  <div class="controls">
+    <button class="mic-btn" id="micBtn" aria-label="Start singing with Thangam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/>
+        <path d="M19 11a7 7 0 0 1-14 0"/>
+        <path d="M12 18v3"/>
+      </svg>
+    </button>
+    <div class="status" id="status">tap the mic to bring Thangam on stage</div>
+
+    <div class="meter-wrap">
+      <div class="meter-label"><span>confidence</span><span id="meterPct">0%</span></div>
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+    </div>
+  </div>
+
+  <p class="note">Built for TinkerHub Useless Projects. Needs mic access — nothing is recorded or sent anywhere, it all stays in your browser.</p>
+</div>
+
+<script>
+const micBtn = document.getElementById('micBtn');
+const statusEl = document.getElementById('status');
+const stage = document.getElementById('stage');
+const character = document.getElementById('character');
+const spotlight = document.getElementById('spotlight');
+const floorGlow = document.getElementById('floorGlow');
+const labelRow = document.getElementById('labelRow');
+const meterFill = document.getElementById('meterFill');
+const meterPct = document.getElementById('meterPct');
+
+let audioCtx, micStream, sourceNode, analyser, delayNode, delayGain, harmonyShift1, harmonyShift2, dryGain;
+let listening = false;
+let confidence = 0; // 0..1
+let silenceFrames = 0;
+let rafId;
+
+const labels = [
+  {min:0,   text:'still finding the courage'},
+  {min:0.18,text:'peeking out from the curtain'},
+  {min:0.4, text:'humming along, barely audible'},
+  {min:0.62,text:'finding the harmony'},
+  {min:0.85,text:'fully committed now'}
+];
+
+function currentLabel(c){
+  let t = labels[0].text;
+  for(const l of labels){ if(c >= l.min) t = l.text; }
+  return t;
+}
+
+async function start(){
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    micStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}});
+    sourceNode = audioCtx.createMediaStreamSource(micStream);
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    sourceNode.connect(analyser);
+
+    // dry pass-through (your own voice, quiet, so Thangam doesn't feel disconnected)
+    dryGain = audioCtx.createGain();
+    dryGain.gain.value = 0.55;
+    sourceNode.connect(dryGain).connect(audioCtx.destination);
+
+    // "harmony" voice 1: delayed + detuned via a second delay+feedback shimmer
+    delayNode = audioCtx.createDelay(2.0);
+    delayNode.delayTime.value = 0.78;
+    delayGain = audioCtx.createGain();
+    delayGain.gain.value = 0.0; // ramps up with confidence
+
+    // simple shimmer: two short modulated delays approximate a soft pitch-shifted harmony
+    harmonyShift1 = audioCtx.createDelay(1.0);
+    harmonyShift1.delayTime.value = 0.012;
+    harmonyShift2 = audioCtx.createDelay(1.0);
+    harmonyShift2.delayTime.value = 0.021;
+
+    const harmonyGain = audioCtx.createGain();
+    harmonyGain.gain.value = 0.9;
+
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'peaking';
+    filt.frequency.value = 900;
+    filt.gain.value = 3;
+
+    sourceNode.connect(delayNode);
+    delayNode.connect(harmonyShift1);
+    harmonyShift1.connect(harmonyShift2);
+    harmonyShift2.connect(filt);
+    filt.connect(harmonyGain);
+    harmonyGain.connect(delayGain);
+    delayGain.connect(audioCtx.destination);
+
+    // gentle feedback so it lingers a touch, not runaway
+    const feedback = audioCtx.createGain();
+    feedback.gain.value = 0.12;
+    delayGain.connect(feedback);
+    feedback.connect(delayNode);
+
+    listening = true;
+    micBtn.classList.add('live');
+    statusEl.innerHTML = 'listening — sing or hum something';
+    stage.classList.add('open');
+    labelRow.classList.add('show');
+
+    loop();
+  }catch(err){
+    statusEl.textContent = "couldn't get mic access — check your browser permissions";
+  }
+}
+
+function stop(){
+  listening = false;
+  if(rafId) cancelAnimationFrame(rafId);
+  if(micStream) micStream.getTracks().forEach(t=>t.stop());
+  if(audioCtx) audioCtx.close();
+  micBtn.classList.remove('live');
+  stage.classList.remove('open');
+  labelRow.classList.remove('show');
+  statusEl.textContent = 'tap the mic to bring Thangam on stage';
+  confidence = 0;
+  updateVisuals(0);
+}
+
+function loop(){
+  if(!listening) return;
+  const data = new Uint8Array(analyser.fftSize);
+  analyser.getByteTimeDomainData(data);
+  let sum = 0;
+  for(let i=0;i<data.length;i++){
+    const v = (data[i]-128)/128;
+    sum += v*v;
+  }
+  const rms = Math.sqrt(sum/data.length); // 0..~0.6 typical singing
+
+  const active = rms > 0.02;
+  if(active){
+    silenceFrames = 0;
+    confidence = Math.min(1, confidence + 0.006 + rms*0.02);
+  }else{
+    silenceFrames++;
+    if(silenceFrames > 40){ // ~0.7s of silence, decay
+      confidence = Math.max(0, confidence - 0.01);
+    }
+  }
+
+  updateVisuals(confidence);
+
+  if(delayGain){
+    delayGain.gain.setTargetAtTime(0.05 + confidence*0.55, audioCtx.currentTime, 0.05);
+  }
+
+  rafId = requestAnimationFrame(loop);
+}
+
+function updateVisuals(c){
+  const pct = Math.round(c*100);
+  meterFill.style.width = pct+'%';
+  meterPct.textContent = pct+'%';
+
+  const gold = `rgba(242,193,78,${0.05 + c*0.35})`;
+  const goldFloor = `rgba(242,193,78,${0.04 + c*0.28})`;
+  spotlight.style.background = `radial-gradient(circle, ${gold} 0%, rgba(242,193,78,0) 65%)`;
+  floorGlow.style.background = `radial-gradient(ellipse, ${goldFloor} 0%, transparent 75%)`;
+
+  const scale = 0.94 + c*0.12;
+  const rise = c*10;
+  character.style.transform = `translate(-50%, -${rise}px) scale(${scale})`;
+
+  const bodyFill = c > 0.6 ? '#2E2A55' : '#20243F';
+  document.querySelectorAll('.character .body').forEach(el=> el.style.fill = bodyFill);
+  document.querySelector('.glow-outline').style.strokeOpacity = Math.max(0, c-0.3)*1.1;
+
+  labelRow.textContent = currentLabel(c);
+  labelRow.style.color = c > 0.6 ? 'var(--gold)' : 'var(--ink-dim)';
+}
+
+micBtn.addEventListener('click', ()=>{
+  if(!listening) start(); else stop();
+});
+</script>
+</body>
+</html>
