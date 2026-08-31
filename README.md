@@ -1,2 +1,1 @@
-# thangam
-A shy backup singer that harmonizes with your mic input and gets bolder the more you sing. Pure Web Audio API, no backend..
+Thangam — a shy backup singer. Sing or hum into your mic...it echoes back a harmony a beat late and gets bolder the longer you keep going. Built using the Web Audio API — nothing is recorded or sent anywhere.
